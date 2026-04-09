@@ -14,7 +14,7 @@
 
 // Design for Dimension == 2 for now
 template <unsigned int Dimension>
-typename itk::EllipseSpatialObject<Dimension>
+typename itk::EllipseSpatialObject<Dimension>::Pointer
 drawCircle() {
     using EllipseType = itk::EllipseSpatialObject<Dimension>;
 
@@ -22,7 +22,7 @@ drawCircle() {
 
     // Set radius, position
     // First circle radius 30.0 mm -> diameter 60.0
-    circle->SetRadiusInObjectSpace(60.0);
+    circle->SetRadiusInObjectSpace(30.0);
 
     // We need perform a translation to set circle position
     using TransformType = typename EllipseType::TransformType;
@@ -49,7 +49,7 @@ int main(int argc, char* * argv) {
 
     //auto circle = EllipseType::New();
 
-    auto circle = drawCircle<2>();
+    auto circle = drawCircle<Dimension>();
 
 
     return EXIT_SUCCESS;
