@@ -31,6 +31,6 @@ include(${GenerateCLP_USE_FILE})
 include(${SlicerExecutionModel_USE_FILE})
 include(${SlicerExecutionModel_CMAKE_DIR}/SEMMacroBuildCLI.cmake)
 
-set(MYHAWKID "ocx") # <----- TODO: YOU MUST CHANGE THIS!
+set(MYHAWKID "ocx")
 
 add_subdirectory(Registration)
