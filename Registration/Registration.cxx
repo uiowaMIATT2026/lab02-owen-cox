@@ -87,11 +87,22 @@ int main(int argc, char* * argv) {
     rasterize->SetInsideValue(255);
     rasterize->SetOutsideValue(0);
 
+    // May want try-catch blocks here
     rasterize->Update();
+
+    FixedImageType::Pointer circleImage0 = rasterize->GetOutput();
+
+    rasterize->SetInput(circle1);
+    rasterize->Update();
+
+    MovingImageType::Pointer circleImage1 = rasterize->GetOutput();
+
+
 
 
 
     // Probably want to use a similarity transform since we are only doing translation and scaling
+    // This is all from the ITK Software Guide Registration Hello World
 
     using TransformType = itk::TranslationTransform<double, Dimension>;
     using OptimizerType = itk::RegularStepGradientDescentOptimizerv4<double>;
@@ -114,7 +125,43 @@ int main(int argc, char* * argv) {
     metric->SetFixedInterpolator(fixedInterpolator);
     metric->SetMovingInterpolator(movingInterpolator);
 
+    auto movingInitialTransform = TransformType::New();
+    TransformType::ParametersType initialParameters(movingInitialTransform->GetNumberOfParameters());
+    initialParameters[0] = 0.0; // Initial offset in mm along X
+    initialParameters[1] = 0.0; // Initial offset in mm along Y
+    movingInitialTransform->SetParameters(initialParameters);
+    registration->SetMovingInitialTransform(movingInitialTransform);
 
+    auto identityTransform = TransformType::New();
+    identityTransform->SetIdentity();
+    registration->SetFixedInitialTransform(identityTransform);
+
+    optimizer->SetLearningRate(4);
+    optimizer->SetMinimumStepLength(0.001);
+    optimizer->SetRelaxationFactor(0.5);
+    optimizer->SetNumberOfIterations(200);
+
+    constexpr unsigned int numberOfLevels = 1;
+    RegistrationType::ShrinkFactorsArrayType shrinkFactorsPerLevel;
+    shrinkFactorsPerLevel.SetSize(1);
+    shrinkFactorsPerLevel[0] = 1;
+    RegistrationType::SmoothingSigmasArrayType smoothingSigmasPerLevel;
+    smoothingSigmasPerLevel.SetSize(1);
+    smoothingSigmasPerLevel[0] = 0;
+    registration->SetNumberOfLevels(numberOfLevels);
+    registration->SetSmoothingSigmasPerLevel(smoothingSigmasPerLevel);
+    registration->SetShrinkFactorsPerLevel(shrinkFactorsPerLevel);
+
+    try {
+        registration->Update();
+        std::cout << "Optimizer stop condition: "
+                  << registration->GetOptimizer()->GetStopConditionDescription()
+                  << std::endl;
+    } catch (const itk::ExceptionObject & err) {
+        std::cerr << "ExceptionObject caught !" << std::endl;
+        std::cerr << err << std::endl;
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 
