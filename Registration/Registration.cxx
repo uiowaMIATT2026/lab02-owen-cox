@@ -8,9 +8,24 @@
 #include "itkImageFileWriter.h"
 
 
-// Ellipse function sounds useful
+// Ellipse function sounds useful for circles
 #include "itkEllipseSpatialObject.h"
 
+
+// Design for Dimension == 2 for now
+template <unsigned int Dimension>
+typename itk::EllipseSpatialObject<Dimension>
+drawDircles() {
+    using EllipseType = itk::EllipseSpatialObject<Dimension>;
+
+    auto circle = EllipseType::New();
+
+    // Set radius, position
+    // First circle radius 30.0 mm -> diameter 60.0
+    circle->SetRadiusInObjectSpace(60.0);
+
+    return circle;
+}
 
 int main(int argc, char* * argv) {
     PARSE_ARGS;
