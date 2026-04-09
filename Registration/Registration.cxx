@@ -15,6 +15,7 @@
 // Registration includes
 #include "itkImageRegistrationMethodv4.h"
 #include "itkTranslationTransform.h"
+#include "itkSimilarity2DTransform.h"
 #include "itkMeanSquaresImageToImageMetricv4.h"
 #include "itkRegularStepGradientDescentOptimizerv4.h"
 
@@ -104,7 +105,8 @@ int main(int argc, char* * argv) {
     // Probably want to use a similarity transform since we are only doing translation and scaling
     // This is all from the ITK Software Guide Registration Hello World
 
-    using TransformType = itk::TranslationTransform<double, Dimension>;
+    // using TransformType = itk::TranslationTransform<double, Dimension>;
+    using TransformType = itk::Similarity2DTransform<double>;
     using OptimizerType = itk::RegularStepGradientDescentOptimizerv4<double>;
     using MetricType = itk::MeanSquaresImageToImageMetricv4<FixedImageType, MovingImageType>;
     using RegistrationType = itk::ImageRegistrationMethodv4<FixedImageType, MovingImageType, TransformType>;
@@ -116,50 +118,70 @@ int main(int argc, char* * argv) {
     registration->SetMetric(metric);
     registration->SetOptimizer(optimizer);
 
-    using FixedLinearInterpolatorType = itk::LinearInterpolateImageFunction<FixedImageType, double>;
-    using MovingLinearInterpolatorType = itk::LinearInterpolateImageFunction<MovingImageType, double>;
-
-    auto fixedInterpolator = FixedLinearInterpolatorType::New();
-    auto movingInterpolator = MovingLinearInterpolatorType::New();
-
-    metric->SetFixedInterpolator(fixedInterpolator);
-    metric->SetMovingInterpolator(movingInterpolator);
+    registration->SetFixedImage(circleImage0);
+    registration->SetMovingImage(circleImage1);
 
     auto movingInitialTransform = TransformType::New();
+    movingInitialTransform->SetIdentity();
+
+    TransformType::InputPointType center;
+    center[0] = 200.0;
+    center[1] = 200.0;
+    movingInitialTransform->SetCenter(center);
+
     TransformType::ParametersType initialParameters(movingInitialTransform->GetNumberOfParameters());
-    initialParameters[0] = 0.0; // Initial offset in mm along X
-    initialParameters[1] = 0.0; // Initial offset in mm along Y
+
+    initialParameters[0] = 1.0;
+    initialParameters[1] = 0.0;
+    initialParameters[2] = 0.0;
+    initialParameters[3] = 0.0;
+
     movingInitialTransform->SetParameters(initialParameters);
     registration->SetMovingInitialTransform(movingInitialTransform);
 
-    auto identityTransform = TransformType::New();
-    identityTransform->SetIdentity();
-    registration->SetFixedInitialTransform(identityTransform);
+    auto fixedInitialTransform = TransformType::New();
+    fixedInitialTransform->SetIdentity();
+    registration->SetFixedInitialTransform(fixedInitialTransform);
 
-    optimizer->SetLearningRate(4);
-    optimizer->SetMinimumStepLength(0.001);
+    OptimizerType::ScalesType optimizerScales(movingInitialTransform->GetNumberOfParameters());
+
+    optimizerScales[0] = 1.0;
+    optimizerScales[1] = 1.0;
+    optimizerScales[2] = 0.001;
+    optimizerScales[3] = 0.001;
+
+    optimizer->SetLearningRate(1.0);
+    optimizer->SetMinimumStepLength(0.0001);
     optimizer->SetRelaxationFactor(0.5);
     optimizer->SetNumberOfIterations(200);
 
     constexpr unsigned int numberOfLevels = 1;
+
     RegistrationType::ShrinkFactorsArrayType shrinkFactorsPerLevel;
     shrinkFactorsPerLevel.SetSize(1);
     shrinkFactorsPerLevel[0] = 1;
+
     RegistrationType::SmoothingSigmasArrayType smoothingSigmasPerLevel;
     smoothingSigmasPerLevel.SetSize(1);
     smoothingSigmasPerLevel[0] = 0;
+
     registration->SetNumberOfLevels(numberOfLevels);
     registration->SetSmoothingSigmasPerLevel(smoothingSigmasPerLevel);
     registration->SetShrinkFactorsPerLevel(shrinkFactorsPerLevel);
 
     try {
         registration->Update();
-        std::cout << "Optimizer stop condition: "
-                  << registration->GetOptimizer()->GetStopConditionDescription()
-                  << std::endl;
-    } catch (const itk::ExceptionObject & err) {
-        std::cerr << "ExceptionObject caught !" << std::endl;
-        std::cerr << err << std::endl;
+
+        const auto finalParameters = registration->GetTransform()->GetParameters();
+
+        std::cout << "Final scale: " << finalParameters[0] << std::endl;
+        std::cout << "Final angle: " << finalParameters[1] << std::endl;
+        std::cout << "Final tx: " << finalParameters[2] << std::endl;
+        std::cout << "Final ty: " << finalParameters[3] << std::endl;
+
+
+    } catch (const itk::ExceptionObject & error) {
+        std::cerr << "Error: " << error << std::endl;
         return EXIT_FAILURE;
     }
 
