@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<executable>
+    <category>
+        MIATT.ocx.LAB02
+    </category>
+    <title>
+        MIATT Registration LAB02
+    </title>
+    <description>
+        A Slicer Module to perform a registration task
+    </description>
+    <version>1.0</version>
+    <contributor> Owen Cox </contributor>
+    <parameters>
+        <label>Input/Output Volumes</label>
+        <description>Selection of Input and Output volumes</description>
+        <image>
+            <name>inputVolume</name>
+            <label>Input Volume</label>
+            <channel>input</channel>
+            <longflag>inputVolume</longflag>
+            <default>/nfsscratch/opt/ece5490/data/subj1_T1_raw.nii.gz</default>
+        </image>
+        <image>
+            <name>outputVolume</name>
+            <label>Output Volume</label>
+            <channel>output</channel>
+            <longflag>outputVolume</longflag>
+            <default>/tmp/out.nii.gz</default>
+        </image>
+    </parameters>
+</executable>
