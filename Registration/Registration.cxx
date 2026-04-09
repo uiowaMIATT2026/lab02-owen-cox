@@ -13,16 +13,18 @@
 
 
 // Design for Dimension == 2 for now
+// May want to make radius, x, y type float or double
+// I will use unsigned int for testing
 template <unsigned int Dimension>
 typename itk::EllipseSpatialObject<Dimension>::Pointer
-drawCircle() {
+drawCircle(unsigned int radius, unsigned int x, unsigned int y) {
     using EllipseType = itk::EllipseSpatialObject<Dimension>;
 
     auto circle = EllipseType::New();
 
     // Set radius, position
-    // First circle radius 30.0 mm -> diameter 60.0
-    circle->SetRadiusInObjectSpace(30.0);
+    // First circle radius 315.0 mm -> diameter 30.0
+    circle->SetRadiusInObjectSpace(radius);
 
     // We need perform a translation to set circle position
     using TransformType = typename EllipseType::TransformType;
@@ -30,8 +32,8 @@ drawCircle() {
     transform->SetIdentity();
 
     typename TransformType::OutputVectorType translation;
-    translation[0] = 50.0;
-    translation[1] = 50.0;
+    translation[0] = x;
+    translation[1] = y;
 
     transform->Translate(translation, false);
     circle->SetObjectToParentTransform(transform);
@@ -49,7 +51,8 @@ int main(int argc, char* * argv) {
 
     //auto circle = EllipseType::New();
 
-    auto circle = drawCircle<Dimension>();
+    auto circle0 = drawCircle<Dimension>(15, 50, 50);
+    auto circle1 = drawCircle<Dimension>(30, 200, 200);
 
 
     return EXIT_SUCCESS;
