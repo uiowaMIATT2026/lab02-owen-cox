@@ -48,6 +48,7 @@ drawCircle(double radius, double x, double y) {
     return circle;
 }
 
+// Do not try to run main, this seems to break things somehow
 int main(int argc, char* * argv) {
     PARSE_ARGS;
 
