@@ -140,13 +140,14 @@ int main(int argc, char* * argv) {
 
     TransformType::ParametersType initialParameters(initialTransform->GetNumberOfParameters());
 
-    initialParameters[0] = 1.0;
+    initialParameters[0] = 0.5;
     initialParameters[1] = 0.0;
-    initialParameters[2] = 0.0;
-    initialParameters[3] = 0.0;
+    initialParameters[2] = -150.0;
+    initialParameters[3] = -150.0;
 
     initialTransform->SetParameters(initialParameters);
     registration->SetInitialTransform(initialTransform);
+    registration->InPlaceOn();
 
     auto fixedInitialTransform = TransformType::New();
     fixedInitialTransform->SetIdentity();
