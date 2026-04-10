@@ -130,35 +130,36 @@ int main(int argc, char* * argv) {
     registration->SetFixedImage(circleImage0);
     registration->SetMovingImage(circleImage1);
 
-    auto movingInitialTransform = TransformType::New();
-    movingInitialTransform->SetIdentity();
+    auto initialTransform = TransformType::New();
+    initialTransform->SetIdentity();
 
     TransformType::InputPointType center;
     center[0] = 200.0;
     center[1] = 200.0;
-    movingInitialTransform->SetCenter(center);
+    initialTransform->SetCenter(center);
 
-    TransformType::ParametersType initialParameters(movingInitialTransform->GetNumberOfParameters());
+    TransformType::ParametersType initialParameters(initialTransform->GetNumberOfParameters());
 
     initialParameters[0] = 1.0;
     initialParameters[1] = 0.0;
     initialParameters[2] = 0.0;
     initialParameters[3] = 0.0;
 
-    movingInitialTransform->SetParameters(initialParameters);
-    registration->SetMovingInitialTransform(movingInitialTransform);
+    initialTransform->SetParameters(initialParameters);
+    registration->SetInitialTransform(initialTransform);
 
     auto fixedInitialTransform = TransformType::New();
     fixedInitialTransform->SetIdentity();
     registration->SetFixedInitialTransform(fixedInitialTransform);
 
-    OptimizerType::ScalesType optimizerScales(movingInitialTransform->GetNumberOfParameters());
+    OptimizerType::ScalesType optimizerScales(initialTransform->GetNumberOfParameters());
 
     optimizerScales[0] = 1.0;
     optimizerScales[1] = 1.0;
     optimizerScales[2] = 0.001;
     optimizerScales[3] = 0.001;
 
+    optimizer->SetScales(optimizerScales);
     optimizer->SetLearningRate(1.0);
     optimizer->SetMinimumStepLength(0.0001);
     optimizer->SetRelaxationFactor(0.5);
