@@ -66,38 +66,46 @@ int main(int argc, char* * argv) {
     using FixedImageType = itk::Image<PixelType, Dimension>;
     using MovingImageType = itk::Image<PixelType, Dimension>;
 
-    using RasterizeFilterType = itk::SpatialObjectToImageFilter<CircleType, ImageType>;
+    using rasterizeFilterType = itk::SpatialObjectToImageFilter<CircleType, ImageType>;
 
-    auto rasterize = RasterizeFilterType::New();
-    rasterize->SetInput(circle0);
+    auto rasterize0 = rasterizeFilterType::New();
+    auto rasterize1 = rasterizeFilterType::New();
+
+    rasterize0->SetInput(circle0);
+    rasterize1->SetInput(circle1);
 
     ImageType::SizeType size;
     size[0] = 512;
     size[1] = 512;
-    rasterize->SetSize(size);
+
+    rasterize0->SetSize(size);
+    rasterize1->SetSize(size);
 
     ImageType::SpacingType spacing;
     spacing[0] = 1.0;
     spacing[1] = 1.0;
-    rasterize->SetSpacing(spacing);
+    rasterize0->SetSpacing(spacing);
+    rasterize1->SetSpacing(spacing);
 
     ImageType::PointType origin;
     origin[0] = 0.0;
     origin[1] = 0.0;
-    rasterize->SetOrigin(origin);
+    rasterize0->SetOrigin(origin);
+    rasterize1->SetOrigin(origin);
 
-    rasterize->SetInsideValue(255);
-    rasterize->SetOutsideValue(0);
+    rasterize0->SetInsideValue(255);
+    rasterize0->SetOutsideValue(0);
+
+    rasterize1->SetInsideValue(255);
+    rasterize1->SetOutsideValue(0);
+
 
     // May want try-catch blocks here
-    rasterize->Update();
+    rasterize0->Update();
+    rasterize1->Update();
 
-    FixedImageType::Pointer circleImage0 = rasterize->GetOutput();
-
-    rasterize->SetInput(circle1);
-    rasterize->Update();
-
-    MovingImageType::Pointer circleImage1 = rasterize->GetOutput();
+    FixedImageType::Pointer circleImage0 = rasterize0->GetOutput();
+    MovingImageType::Pointer circleImage1 = rasterize1->GetOutput();
 
 
 
