@@ -140,16 +140,16 @@ int main(int argc, char* * argv) {
     initialTransform->SetIdentity();
 
     TransformType::InputPointType center;
-    center[0] = 200.0;
-    center[1] = 200.0;
+    center[0] = 50.0;
+    center[1] = 50.0;
     initialTransform->SetCenter(center);
 
     TransformType::ParametersType initialParameters(initialTransform->GetNumberOfParameters());
 
     initialParameters[0] = 0.5;
     initialParameters[1] = 0.0;
-    initialParameters[2] = -150.0;
-    initialParameters[3] = -150.0;
+    initialParameters[2] = 150.0;
+    initialParameters[3] = 150.0;
 
     initialTransform->SetParameters(initialParameters);
     registration->SetInitialTransform(initialTransform);
@@ -167,7 +167,7 @@ int main(int argc, char* * argv) {
     optimizerScales[3] = 0.001;
 
     optimizer->SetScales(optimizerScales);
-    optimizer->SetLearningRate(0.1);
+    optimizer->SetLearningRate(1.0);
     optimizer->SetMinimumStepLength(0.00001);
     optimizer->SetRelaxationFactor(0.5);
     optimizer->SetNumberOfIterations(200);
@@ -215,7 +215,7 @@ int main(int argc, char* * argv) {
         resampler->SetOutputOrigin(circleImage0->GetOrigin());
         resampler->SetOutputSpacing(circleImage0->GetSpacing());
         resampler->SetOutputDirection(circleImage0->GetDirection());
-        resampler->SetDefaultPixelValue(17);
+        resampler->SetDefaultPixelValue(17); // Setting this to 17 for debugging purposes
 
         resampler->Update();
 
