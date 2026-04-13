@@ -11,4 +11,14 @@
     </description>
     <version>1.0</version>
     <contributor> Owen Cox </contributor>
+    <parameters>
+        <image>
+            <name>outputImageFile</name>
+            <longflag>outputImageFile</longflag>
+            <label>Output Image Volume</label>
+            <description>Path to the output image.</description>
+            <default></default>
+            <channel>output</channel>
+        </image>
+    </parameters>
 </executable>

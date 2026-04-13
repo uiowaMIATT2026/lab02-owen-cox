@@ -221,6 +221,35 @@ int main(int argc, char* * argv) {
         transformedMovingImage->DisconnectPipeline();
 
         // Difference image testing
+        using SubtractType = itk::SubtractImageFilter<FixedImageType, FixedImageType, FixedImageType>;
+        auto subtract = SubtractType::New();
+
+        subtract->SetInput1(circleImage0);
+        subtract->SetInput2(transformedMovingImage);
+        subtract->Update();
+
+        //itk::WriteImage(subtract, outputImageFile);
+
+        using WriterType = itk::ImageFileWriter<FixedImageType>;
+
+        auto writer = WriterType::New();
+        writer->SetFileName("registrationDifferenceTest.nii.gz");
+        writer->SetInput(subtract->GetOutput());
+        writer->Update();
+
+        // Drawing circles so I can visualize what is going on
+        writer->SetFileName("circle0.nii.gz");
+        writer->SetInput(circleImage0);
+        writer->Update();
+
+        writer->SetFileName("circle1.nii.gz");
+        writer->SetInput(circleImage1);
+        writer->Update();
+
+
+        writer->SetFileName("transformed.nii.gz");
+        writer->SetInput(transformedMovingImage);
+        writer->Update();
 
 
     } catch (const itk::ExceptionObject & error) {
