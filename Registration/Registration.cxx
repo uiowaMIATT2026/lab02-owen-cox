@@ -99,11 +99,11 @@ int main(int argc, char* * argv) {
     rasterize0->SetOrigin(origin);
     rasterize1->SetOrigin(origin);
 
-    rasterize0->SetInsideValue(255);
-    rasterize0->SetOutsideValue(0);
+    rasterize0->SetInsideValue(255.0);
+    rasterize0->SetOutsideValue(0.0);
 
-    rasterize1->SetInsideValue(255);
-    rasterize1->SetOutsideValue(0);
+    rasterize1->SetInsideValue(255.0);
+    rasterize1->SetOutsideValue(0.0);
 
 
     // May want try-catch blocks here
@@ -167,24 +167,24 @@ int main(int argc, char* * argv) {
     optimizerScales[3] = 0.001;
 
     optimizer->SetScales(optimizerScales);
-    optimizer->SetLearningRate(1.0);
-    optimizer->SetMinimumStepLength(0.0001);
+    optimizer->SetLearningRate(0.1);
+    optimizer->SetMinimumStepLength(0.00001);
     optimizer->SetRelaxationFactor(0.5);
     optimizer->SetNumberOfIterations(200);
 
-    constexpr unsigned int numberOfLevels = 1;
+    const unsigned int numberOfLevels = 1;
 
     RegistrationType::ShrinkFactorsArrayType shrinkFactorsPerLevel;
-    shrinkFactorsPerLevel.SetSize(1);
+    shrinkFactorsPerLevel.SetSize( 1 );
     shrinkFactorsPerLevel[0] = 1;
 
     RegistrationType::SmoothingSigmasArrayType smoothingSigmasPerLevel;
-    smoothingSigmasPerLevel.SetSize(1);
+    smoothingSigmasPerLevel.SetSize( 1 );
     smoothingSigmasPerLevel[0] = 0;
 
-    registration->SetNumberOfLevels(numberOfLevels);
-    registration->SetSmoothingSigmasPerLevel(smoothingSigmasPerLevel);
-    registration->SetShrinkFactorsPerLevel(shrinkFactorsPerLevel);
+    registration->SetNumberOfLevels ( numberOfLevels );
+    registration->SetSmoothingSigmasPerLevel( smoothingSigmasPerLevel );
+    registration->SetShrinkFactorsPerLevel( shrinkFactorsPerLevel );
 
     // I may want to use itk::CenteredTransformInitializer
 
@@ -202,6 +202,8 @@ int main(int argc, char* * argv) {
         using InterpolatorType = itk::LinearInterpolateImageFunction<MovingImageType, double>;
 
         auto finalTransform = registration->GetTransform();
+
+
         auto resampler = ResampleFilterType::New();
         auto interpolator = InterpolatorType::New();
 
@@ -228,14 +230,13 @@ int main(int argc, char* * argv) {
         subtract->SetInput2(transformedMovingImage);
         subtract->Update();
 
+        // Checkerboard image testing
+
+
         //itk::WriteImage(subtract, outputImageFile);
 
         using WriterType = itk::ImageFileWriter<FixedImageType>;
-
         auto writer = WriterType::New();
-        writer->SetFileName("registrationDifferenceTest.nii.gz");
-        writer->SetInput(subtract->GetOutput());
-        writer->Update();
 
         // Drawing circles so I can visualize what is going on
         writer->SetFileName("circle0.nii.gz");
@@ -246,11 +247,13 @@ int main(int argc, char* * argv) {
         writer->SetInput(circleImage1);
         writer->Update();
 
-
         writer->SetFileName("transformed.nii.gz");
         writer->SetInput(transformedMovingImage);
         writer->Update();
 
+        writer->SetFileName("registrationDifferenceTest.nii.gz");
+        writer->SetInput(subtract->GetOutput());
+        writer->Update();
 
     } catch (const itk::ExceptionObject & error) {
         std::cerr << "Error: " << error << std::endl;
