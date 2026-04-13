@@ -213,7 +213,7 @@ int main(int argc, char* * argv) {
         resampler->SetOutputOrigin(circleImage0->GetOrigin());
         resampler->SetOutputSpacing(circleImage0->GetSpacing());
         resampler->SetOutputDirection(circleImage0->GetDirection());
-        resampler->SetDefaultPixelValue(0);
+        resampler->SetDefaultPixelValue(17);
 
         resampler->Update();
 
