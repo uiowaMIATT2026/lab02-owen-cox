@@ -251,7 +251,7 @@ int main(int argc, char* * argv) {
         writer->SetInput(transformedMovingImage);
         writer->Update();
 
-        writer->SetFileName("registrationDifferenceTest.nii.gz");
+        writer->SetFileName("difference.nii.gz");
         writer->SetInput(subtract->GetOutput());
         writer->Update();
 
