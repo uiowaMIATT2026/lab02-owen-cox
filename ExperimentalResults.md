@@ -1,11 +1,9 @@
-# Hello
+# Experimental Results
 
-I am using C++ with CLion for this because I have some experience using this environment.
-Also, the ITK Software Guide Registration Hello World example uses C++.
-I do not want to introduce unknown new variables with Python for now.
+I created a difference image 
 
-https://docs.itk.org/projects/doxygen/en/v4.8.0/Examples_2RegistrationITKv4_2ImageRegistration7_8cxx-example.html
+I calculated the RMSE by loading my resulting images into MATLAB and using its rmse() function.
+RMSE: 2.5017e-05
 
-My approach is to use the itk::EllipseSpatialObject and itk::SpatialObjectToImageFilter to generate images of the two circles.
-Then, I will use a similarity transform since we should only need scaling and translation.
-I will compare results using a difference image.
+This small RMSE indicates that the registration was successful.
+
