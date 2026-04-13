@@ -19,6 +19,12 @@
 #include "itkMeanSquaresImageToImageMetricv4.h"
 #include "itkRegularStepGradientDescentOptimizerv4.h"
 
+// For visualizing applied registration
+#include "itkResampleImageFilter.h"
+#include "itkLinearInterpolateImageFunction.h"
+#include "itkCheckerBoardImageFilter.h"
+#include "itkSubtractImageFilter.h"
+
 // Design for Dimension == 2 for now
 // May want to make radius, x, y type float or double
 // I will use unsigned int for testing
@@ -112,7 +118,7 @@ int main(int argc, char* * argv) {
 
 
     // Probably want to use a similarity transform since we are only doing translation and scaling
-    // This is all from the ITK Software Guide Registration Hello World
+    // This is based on ITK Software Guide Registration Hello World
 
     // using TransformType = itk::TranslationTransform<double, Dimension>;
     using TransformType = itk::Similarity2DTransform<double>;
@@ -180,6 +186,8 @@ int main(int argc, char* * argv) {
     registration->SetSmoothingSigmasPerLevel(smoothingSigmasPerLevel);
     registration->SetShrinkFactorsPerLevel(shrinkFactorsPerLevel);
 
+    // I may want to use itk::CenteredTransformInitializer
+
     try {
         registration->Update();
 
@@ -189,6 +197,30 @@ int main(int argc, char* * argv) {
         std::cout << "Final angle: " << finalParameters[1] << std::endl;
         std::cout << "Final tx: " << finalParameters[2] << std::endl;
         std::cout << "Final ty: " << finalParameters[3] << std::endl;
+
+        using ResampleFilterType = itk::ResampleImageFilter<MovingImageType, FixedImageType>;
+        using InterpolatorType = itk::LinearInterpolateImageFunction<MovingImageType, double>;
+
+        auto finalTransform = registration->GetTransform();
+        auto resampler = ResampleFilterType::New();
+        auto interpolator = InterpolatorType::New();
+
+        resampler->SetInput(circleImage1);
+        resampler->SetTransform(finalTransform);
+        resampler->SetInterpolator(interpolator);
+
+        resampler->SetSize(circleImage0->GetLargestPossibleRegion().GetSize());
+        resampler->SetOutputOrigin(circleImage0->GetOrigin());
+        resampler->SetOutputSpacing(circleImage0->GetSpacing());
+        resampler->SetOutputDirection(circleImage0->GetDirection());
+        resampler->SetDefaultPixelValue(0);
+
+        resampler->Update();
+
+        FixedImageType::Pointer transformedMovingImage = resampler->GetOutput();
+        transformedMovingImage->DisconnectPipeline();
+
+        // Difference image testing
 
 
     } catch (const itk::ExceptionObject & error) {
