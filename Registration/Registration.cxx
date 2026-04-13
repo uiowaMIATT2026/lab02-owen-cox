@@ -146,10 +146,10 @@ int main(int argc, char* * argv) {
 
     TransformType::ParametersType initialParameters(initialTransform->GetNumberOfParameters());
 
-    initialParameters[0] = 0.5;
+    initialParameters[0] = 1.0;
     initialParameters[1] = 0.0;
-    initialParameters[2] = 150.0;
-    initialParameters[3] = 150.0;
+    initialParameters[2] = 100.0;
+    initialParameters[3] = 100.0;
 
     initialTransform->SetParameters(initialParameters);
     registration->SetInitialTransform(initialTransform);
@@ -229,9 +229,6 @@ int main(int argc, char* * argv) {
         subtract->SetInput1(circleImage0);
         subtract->SetInput2(transformedMovingImage);
         subtract->Update();
-
-        // Checkerboard image testing
-
 
         //itk::WriteImage(subtract, outputImageFile);
 
