@@ -6,3 +6,6 @@ I do not want to introduce unknown new variables with Python for now.
 
 https://docs.itk.org/projects/doxygen/en/v4.8.0/Examples_2RegistrationITKv4_2ImageRegistration7_8cxx-example.html
 
+My approach is to use the itk::EllipseSpatialObject and itk::SpatialObjectToImageFilter to generate images of the two circles.
+Then, I will use a similarity transform since we should only need scaling and translation.
+I will compare results using a difference image.
